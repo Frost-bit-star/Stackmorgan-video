@@ -1,0 +1,33 @@
+name: Sync and Deploy to InfinityFree using LFTP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install LFTP
+        run: |
+          sudo apt update
+          sudo apt install -y lftp
+
+      - name: Sync with GitHub and Deploy to InfinityFree
+        run: |
+          FTP_USER="if0_38732172"
+          FTP_PASS="J6Lbr6A1OEd"
+          FTP_SERVER="ftpupload.net"
+          
+          # Sync local changes to InfinityFree
+          lftp -u $FTP_USER,$FTP_PASS $FTP_SERVER <<EOF
+          cd htdocs
+          mirror --reverse --delete --verbose .
+          EOF
+        env:
+          LFTP_VERBOSE: 1
